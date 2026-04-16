@@ -25,29 +25,22 @@
         <h2 class="panel-title">Emissão de Nota</h2>
         <div class="form-row">
           <input
-            type="number"
-            class="form-input"
-            placeholder="Produto ID"
-            min="0"
-            [(ngModel)]="itemFormulario.produtoId"
-          />
-          <input
             type="text"
             class="form-input"
-            placeholder="Código do produto (ex: P004)"
+            placeholder="Código do produto (ex: P001)"
             [(ngModel)]="itemFormulario.produtoCodigo"
           />
           <input
             type="number"
             class="form-input"
-            placeholder="Quantidade"
+            placeholder="Quantidade (ex: 1)"
             min="1"
             [(ngModel)]="itemFormulario.quantidade"
           />
           <input
             type="number"
             class="form-input"
-            placeholder="Total da nota"
+            placeholder="Total da nota (ex: 242.00)"
             min="0"
             step="0.01"
             [(ngModel)]="novaNota.total"
@@ -78,6 +71,7 @@
 
         <div class="nota-detalhe" *ngIf="notaSelecionada">
           Nota selecionada #{{ notaSelecionada.id }} - Número {{ notaSelecionada.number }} -
+          Data {{ notaSelecionada.date | date: 'dd/MM/yyyy' }} -
           <span class="status-pill" [class.fechada]="notaSelecionada.status === 1">
             {{ statusTextoSelecionado }}
           </span>
@@ -103,9 +97,6 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="loading">
-            <td colspan="6">Carregando notas...</td>
-          </tr>
           <tr *ngFor="let nota of notas">
             <td>{{ nota.id }}</td>
             <td>{{ nota.number }}</td>
@@ -114,7 +105,7 @@
                 {{ nota.status === 0 ? 'Aberta' : 'Fechada' }}
               </span>
             </td>
-            <td>{{ nota.date | date: 'short' }}</td>
+            <td>{{ nota.date | date: 'dd/MM/yyyy' }}</td>
             <td>{{ nota.total | currency: 'BRL' }}</td>
             <td>
               <button type="button" class="btn-secondary small-btn" (click)="imprimir(nota.id)">
@@ -122,7 +113,7 @@
               </button>
             </td>
           </tr>
-          <tr *ngIf="!loading && notas.length === 0">
+          <tr *ngIf="notas.length === 0">
             <td colspan="6">Nenhuma nota encontrada.</td>
           </tr>
         </tbody>

@@ -15,8 +15,10 @@ export interface Invoice {
 export interface InvoiceItem {
   id?: number;
   invoiceId?: number;
+  // Campos do item (mantidos iguais ao que o backend/seeder esperam no modelo).
   produtoId: number;
   produtoCodigo: string;
+  // Pode não ser enviado no front; o backend preenche/normaliza.
   produtoDescricao?: string;
   quantidade: number;
 }
