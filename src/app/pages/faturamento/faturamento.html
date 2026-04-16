@@ -1,0 +1,133 @@
+<section class="faturamento-page">
+  <div class="faturamento-card">
+    <h1 class="page-title">Faturamento (Invoices)</h1>
+
+    <p class="feedback sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+    <p class="feedback erro" *ngIf="erro">{{ erro }}</p>
+
+    <section class="status-summary">
+      <div class="status-card">
+        <span class="status-label">Notas em aberto</span>
+        <strong class="status-value">{{ totalAbertas }}</strong>
+      </div>
+      <div class="status-card">
+        <span class="status-label">Notas fechadas</span>
+        <strong class="status-value">{{ totalFechadas }}</strong>
+      </div>
+      <div class="status-card">
+        <span class="status-label">Total de notas</span>
+        <strong class="status-value">{{ notas.length }}</strong>
+      </div>
+    </section>
+
+    <div class="workspace-grid">
+      <section class="action-panel">
+        <h2 class="panel-title">Emissão de Nota</h2>
+        <div class="form-row">
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Produto ID"
+            min="0"
+            [(ngModel)]="itemFormulario.produtoId"
+          />
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Código do produto (ex: P004)"
+            [(ngModel)]="itemFormulario.produtoCodigo"
+          />
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Quantidade"
+            min="1"
+            [(ngModel)]="itemFormulario.quantidade"
+          />
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Total da nota"
+            min="0"
+            step="0.01"
+            [(ngModel)]="novaNota.total"
+          />
+          <button type="button" class="btn-primary" (click)="gerarNota()">
+            Gerar nota
+          </button>
+        </div>
+      </section>
+
+      <section class="action-panel">
+        <h2 class="panel-title">Consulta e Impressão</h2>
+        <div class="search-row">
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Buscar nota por ID"
+            min="1"
+            [(ngModel)]="buscaId"
+          />
+          <button type="button" class="btn-secondary" (click)="buscarPorId()">
+            Buscar
+          </button>
+          <button type="button" class="btn-secondary" (click)="carregar()">
+            Listar todas
+          </button>
+        </div>
+
+        <div class="nota-detalhe" *ngIf="notaSelecionada">
+          Nota selecionada #{{ notaSelecionada.id }} - Número {{ notaSelecionada.number }} -
+          <span class="status-pill" [class.fechada]="notaSelecionada.status === 1">
+            {{ statusTextoSelecionado }}
+          </span>
+          <button type="button" class="btn-secondary" (click)="imprimir(notaSelecionada.id)">
+            Imprimir
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <section class="action-panel table-panel">
+      <h2 class="panel-title">Histórico de Notas</h2>
+    <div class="table-box">
+      <table class="faturamento-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Número</th>
+            <th>Status</th>
+            <th>Data de emissão</th>
+            <th>Total</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading">
+            <td colspan="6">Carregando notas...</td>
+          </tr>
+          <tr *ngFor="let nota of notas">
+            <td>{{ nota.id }}</td>
+            <td>{{ nota.number }}</td>
+            <td>
+              <span class="status-pill" [class.fechada]="nota.status === 1">
+                {{ nota.status === 0 ? 'Aberta' : 'Fechada' }}
+              </span>
+            </td>
+            <td>{{ nota.date | date: 'short' }}</td>
+            <td>{{ nota.total | currency: 'BRL' }}</td>
+            <td>
+              <button type="button" class="btn-secondary small-btn" (click)="imprimir(nota.id)">
+                Imprimir
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && notas.length === 0">
+            <td colspan="6">Nenhuma nota encontrada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </section>
+  </div>
+</section>

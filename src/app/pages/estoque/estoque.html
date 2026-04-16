@@ -1,0 +1,106 @@
+<section class="estoque-page">
+  <div class="estoque-card">
+    <h1 class="page-title">Gestão de Estoque</h1>
+
+    <p class="feedback sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+    <p class="feedback erro" *ngIf="erro">{{ erro }}</p>
+
+    <div class="workspace-grid">
+      <section class="action-panel">
+        <h2 class="panel-title">Cadastro de Produto</h2>
+        <div class="form-row">
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Código do produto (ex: P005)"
+            [(ngModel)]="novoProduto.codigo"
+          />
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Descrição do produto"
+            [(ngModel)]="novoProduto.descricao"
+          />
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Saldo inicial"
+            min="1"
+            [(ngModel)]="novoProduto.saldoInicial"
+          />
+          <button type="button" class="btn-primary" (click)="cadastrar()">
+            Adicionar ao Estoque
+          </button>
+        </div>
+      </section>
+
+      <section class="action-panel">
+        <h2 class="panel-title">Consulta</h2>
+        <div class="search-row">
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Buscar por código"
+            [(ngModel)]="codigoBusca"
+          />
+          <button type="button" class="btn-secondary" (click)="buscarPorCodigo()">
+            Buscar Produto
+          </button>
+          <button type="button" class="btn-secondary" (click)="listarTodos()">
+            Listar Todos
+          </button>
+        </div>
+      </section>
+
+      <section class="action-panel">
+        <h2 class="panel-title">Movimentação e Ajuste (mesmo código)</h2>
+        <div class="movement-row">
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Código do produto (ex: P003)"
+            [(ngModel)]="codigoMovimento"
+          />
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Quantidade / Novo saldo"
+            min="1"
+            [(ngModel)]="quantidadeMovimento"
+          />
+          <button type="button" class="btn-secondary" (click)="entrada()">Entrada</button>
+          <button type="button" class="btn-danger" (click)="saida()">Saída</button>
+          <button type="button" class="btn-secondary" (click)="ajustar()">Ajustar saldo</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="action-panel table-panel">
+      <h2 class="panel-title">Lista de Produtos</h2>
+    <div class="table-box">
+      <table class="estoque-table">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Saldo</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of produtos">
+            <td>{{ p.id }}</td>
+            <td>{{ p.codigo }}</td>
+            <td>{{ p.descricao }}</td>
+            <td>{{ p.saldo }}</td>
+          </tr>
+          <tr *ngIf="produtos.length === 0">
+            <td colspan="4">Nenhum produto encontrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </section>
+  </div>
+</section>

@@ -1,0 +1,242 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.faturamento-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.faturamento-card {
+  width: 100%;
+  max-width: 1150px;
+  background-color: #050505;
+  border: 1px solid #1b1b1b;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.page-title {
+  margin: 0 0 24px;
+  color: #f9fafb;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.action-panel {
+  background-color: #0b0b0b;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.panel-title {
+  margin: 0 0 12px;
+  color: #e5e7eb;
+  font-size: 1rem;
+}
+
+.table-panel {
+  margin-top: 8px;
+}
+
+.status-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.status-card {
+  background: #0b0b0b;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.status-label {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.status-value {
+  color: #f9fafb;
+  font-size: 1.15rem;
+}
+
+.feedback {
+  margin: 0 0 16px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.feedback.sucesso {
+  background: rgba(22, 163, 74, 0.2);
+  border: 1px solid rgba(22, 163, 74, 0.6);
+  color: #bbf7d0;
+}
+
+.feedback.erro {
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.6);
+  color: #fecaca;
+}
+
+.form-row,
+.search-row {
+  width: 100%;
+  display: grid;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.form-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.search-row {
+  grid-template-columns: 1fr auto auto;
+}
+
+.form-row .btn-primary {
+  grid-column: 1 / -1;
+}
+
+.nota-detalhe {
+  margin-bottom: 20px;
+  color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(22, 163, 74, 0.2);
+  color: #86efac;
+  border: 1px solid rgba(22, 163, 74, 0.45);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.status-pill.fechada {
+  background: rgba(107, 114, 128, 0.25);
+  color: #d1d5db;
+  border-color: rgba(107, 114, 128, 0.55);
+}
+
+.form-input {
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  outline: none;
+  background-color: #f3f4f6;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.form-input:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.btn-primary,
+.btn-secondary {
+  height: 54px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.96rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.small-btn {
+  height: 38px;
+  padding: 0 12px;
+}
+
+.table-box {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+}
+
+.faturamento-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #0b0b0b;
+}
+
+.faturamento-table thead {
+  background-color: #e5e7eb;
+}
+
+.faturamento-table th {
+  padding: 16px;
+  text-align: left;
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.faturamento-table td {
+  padding: 16px;
+  border-top: 1px solid #1f2937;
+  color: #f3f4f6;
+}
+
+@media (max-width: 900px) {
+  .status-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row,
+  .search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+
+  .faturamento-card {
+    padding: 20px;
+  }
+}
