@@ -5,9 +5,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   FaturamentoService,
   Invoice,
-  InvoicePayload,
-  InvoiceItem
+  InvoicePayload
 } from '../../core/services/faturamento';
+import { environment } from '../../../environments/environment';
 
 type InvoiceItemForm = {
   produtoCodigo: string;
@@ -32,6 +32,8 @@ export class FaturamentoComponent implements OnInit {
   mensagem = '';
   erro = '';
   buscaId: number | null = null;
+  gerando = false;
+  imprimindoId: number | null = null;
 
   novaNota: InvoiceFormPayload = {
     total: null,
@@ -51,7 +53,8 @@ export class FaturamentoComponent implements OnInit {
         this.notas = res;
       },
       error: () => {
-        this.erro = 'Falha ao carregar notas.';
+        this.erro =
+          'Falha ao carregar notas. Verifique se a API de faturamento está em ' + environment.apiFaturamento + '.';
       }
     });
   }
@@ -74,11 +77,11 @@ export class FaturamentoComponent implements OnInit {
     }
 
     this.limparFeedback();
+    this.gerando = true;
     const payload: InvoicePayload = {
       total: this.novaNota.total,
       items: [
         {
-          // O backend completa ProdutoId/Descricao consultando o Estoque pelo código.
           produtoId: 0,
           produtoCodigo: codigo,
           quantidade: item.quantidade
@@ -88,12 +91,14 @@ export class FaturamentoComponent implements OnInit {
 
     this.service.gerarNota(payload).subscribe({
       next: () => {
-        this.mensagem = 'Nota gerada com sucesso.';
+        this.mensagem = 'Nota gerada com sucesso (status Aberta). Use Imprimir para fechar e gerar o PDF.';
         this.resetarFormulario();
         this.carregar(false);
+        this.gerando = false;
       },
       error: (err: HttpErrorResponse) => {
         this.erro = this.obterMensagemErro(err);
+        this.gerando = false;
       }
     });
   }
@@ -119,31 +124,96 @@ export class FaturamentoComponent implements OnInit {
 
   imprimir(id: number): void {
     this.limparFeedback();
+    this.imprimindoId = id;
     this.service.imprimirNota(id).subscribe({
       next: (blob) => {
+        void this.tratarRespostaImpressao(id, blob);
+      },
+      error: (err: HttpErrorResponse) => {
+        void this.tratarErroImpressao(err);
+        this.imprimindoId = null;
+      }
+    });
+  }
+
+  notaAberta(nota: Invoice): boolean {
+    return nota.status === 0;
+  }
+
+  private async tratarRespostaImpressao(id: number, blob: Blob): Promise<void> {
+    try {
+      if (!blob || blob.size === 0) {
+        this.erro = 'Resposta vazia ao imprimir.';
+        this.imprimindoId = null;
+        return;
+      }
+
+      const tipo = (blob.type || '').toLowerCase();
+      if (tipo.includes('json') || tipo.includes('problem')) {
+        const text = await blob.text();
+        this.erro = this.mensagemDeJsonErro(text) || 'Não foi possível gerar o PDF.';
+        this.imprimindoId = null;
+        return;
+      }
+
+      if (tipo.includes('pdf') || tipo === '' || tipo === 'application/octet-stream') {
         const url = window.URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = url;
         anchor.download = `nota-${id}.pdf`;
         anchor.click();
         window.URL.revokeObjectURL(url);
-        this.mensagem = 'Arquivo de impressao gerado.';
+        this.mensagem = 'PDF gerado e nota fechada.';
         this.carregar(false);
 
-        // Atualiza o status no painel de "nota selecionada" após o backend fechar na rota /print.
         if (this.notaSelecionada && this.notaSelecionada.id === id) {
           this.service.buscarPorId(id).subscribe({
             next: (res) => (this.notaSelecionada = res),
-            error: () => {
-              // Se falhar ao atualizar a nota selecionada, pelo menos a lista já foi recarregada.
-            }
+            error: () => {}
           });
         }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.erro = this.obterMensagemErro(err) || 'Falha ao gerar impressao da nota.';
+        this.imprimindoId = null;
+        return;
       }
-    });
+
+      const text = await blob.text();
+      if (text.trimStart().startsWith('{')) {
+        this.erro = this.mensagemDeJsonErro(text) || 'Erro ao imprimir.';
+        this.imprimindoId = null;
+        return;
+      }
+
+      this.erro = 'Formato de resposta inesperado ao imprimir.';
+      this.imprimindoId = null;
+    } catch {
+      this.erro = 'Falha ao processar o arquivo de impressão.';
+      this.imprimindoId = null;
+    }
+  }
+
+  private async tratarErroImpressao(err: HttpErrorResponse): Promise<void> {
+    this.erro = (await this.mensagemDeErroHttp(err)) || 'Falha ao gerar impressao da nota.';
+  }
+
+  private mensagemDeJsonErro(text: string): string {
+    try {
+      const j = JSON.parse(text) as { detail?: string; title?: string; error?: string };
+      if (typeof j.detail === 'string' && j.detail.trim()) return j.detail;
+      if (typeof j.title === 'string' && j.title.trim()) return j.title;
+      if (typeof j.error === 'string' && j.error.trim()) return j.error;
+    } catch {
+      /* ignore */
+    }
+    return '';
+  }
+
+  private async mensagemDeErroHttp(err: HttpErrorResponse): Promise<string> {
+    const body = err?.error;
+    if (body instanceof Blob) {
+      const text = await body.text();
+      return this.mensagemDeJsonErro(text) || text.slice(0, 300);
+    }
+    return this.obterMensagemErro(err);
   }
 
   private resetarFormulario(): void {
@@ -159,15 +229,15 @@ export class FaturamentoComponent implements OnInit {
 
   get statusTextoSelecionado(): string {
     if (!this.notaSelecionada) return '';
-    return this.notaSelecionada.status === 0 ? 'Aberta' : 'Fechada';
+    return this.notaAberta(this.notaSelecionada) ? 'Aberta' : 'Fechada';
   }
 
   get totalAbertas(): number {
-    return this.notas.filter((nota) => nota.status === 0).length;
+    return this.notas.filter((nota) => this.notaAberta(nota)).length;
   }
 
   get totalFechadas(): number {
-    return this.notas.filter((nota) => nota.status === 1).length;
+    return this.notas.filter((nota) => !this.notaAberta(nota)).length;
   }
 
   private limparFeedback(): void {
@@ -176,14 +246,23 @@ export class FaturamentoComponent implements OnInit {
   }
 
   private obterMensagemErro(err: HttpErrorResponse): string {
-    // O backend retorna ProblemDetails com { title, detail, ... }.
-    const detail = err?.error?.detail;
+    const body = err?.error;
+    if (typeof body === 'string' && body.trim()) return body;
+
+    const detail = (body as { detail?: string } | null)?.detail;
     if (typeof detail === 'string' && detail.trim()) return detail;
 
-    const title = err?.error?.title;
+    const title = (body as { title?: string } | null)?.title;
     if (typeof title === 'string' && title.trim()) return title;
 
-    // Fallback genérico
-    return 'Falha na operação. Verifique os dados e tente novamente.';
+    const message = (body as { message?: string } | null)?.message;
+    if (typeof message === 'string' && message.trim()) return message;
+
+    if (err.status === 0) {
+      return 'Sem conexão com o servidor de faturamento (CORS ou API offline).';
+    }
+
+    return `Falha na operação (HTTP ${err.status}). Verifique os dados e se o produto existe no estoque.`;
   }
+
 }

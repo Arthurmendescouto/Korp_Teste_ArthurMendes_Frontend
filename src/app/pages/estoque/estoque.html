@@ -12,25 +12,29 @@
           <input
             type="text"
             class="form-input"
+            name="estCodigo"
             placeholder="Código do produto (ex: P005)"
             [(ngModel)]="novoProduto.codigo"
+            [ngModelOptions]="{ standalone: true }"
           />
           <input
             type="text"
             class="form-input"
+            name="estDesc"
             placeholder="Descrição do produto"
             [(ngModel)]="novoProduto.descricao"
+            [ngModelOptions]="{ standalone: true }"
           />
           <input
             type="number"
             class="form-input"
+            name="estSaldo"
             placeholder="Saldo inicial"
             min="1"
             [(ngModel)]="novoProduto.saldoInicial"
+            [ngModelOptions]="{ standalone: true }"
           />
-          <button type="button" class="btn-primary" (click)="cadastrar()">
-            Adicionar ao Estoque
-          </button>
+          <button type="button" class="btn-primary" (click)="cadastrar()">Adicionar ao Estoque</button>
         </div>
       </section>
 
@@ -40,15 +44,13 @@
           <input
             type="text"
             class="form-input"
+            name="estBusca"
             placeholder="Buscar por código"
             [(ngModel)]="codigoBusca"
+            [ngModelOptions]="{ standalone: true }"
           />
-          <button type="button" class="btn-secondary" (click)="buscarPorCodigo()">
-            Buscar Produto
-          </button>
-          <button type="button" class="btn-secondary" (click)="listarTodos()">
-            Listar Todos
-          </button>
+          <button type="button" class="btn-secondary" (click)="buscarPorCodigo()">Buscar Produto</button>
+          <button type="button" class="btn-secondary" (click)="listarTodos()">Listar Todos</button>
         </div>
       </section>
 
@@ -58,15 +60,19 @@
           <input
             type="text"
             class="form-input"
+            name="estMovCod"
             placeholder="Código do produto (ex: P003)"
             [(ngModel)]="codigoMovimento"
+            [ngModelOptions]="{ standalone: true }"
           />
           <input
             type="number"
             class="form-input"
+            name="estMovQtd"
             placeholder="Quantidade / Novo saldo"
             min="1"
             [(ngModel)]="quantidadeMovimento"
+            [ngModelOptions]="{ standalone: true }"
           />
           <button type="button" class="btn-secondary" (click)="entrada()">Entrada</button>
           <button type="button" class="btn-danger" (click)="saida()">Saída</button>
@@ -77,30 +83,30 @@
 
     <section class="action-panel table-panel">
       <h2 class="panel-title">Lista de Produtos</h2>
-    <div class="table-box">
-      <table class="estoque-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Saldo</th>
-          </tr>
-        </thead>
+      <div class="table-box">
+        <table class="estoque-table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Código</th>
+              <th>Descrição</th>
+              <th>Saldo</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr *ngFor="let p of produtos">
-            <td>{{ p.id }}</td>
-            <td>{{ p.codigo }}</td>
-            <td>{{ p.descricao }}</td>
-            <td>{{ p.saldo }}</td>
-          </tr>
-          <tr *ngIf="produtos.length === 0">
-            <td colspan="4">Nenhum produto encontrado.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          <tbody>
+            <tr *ngFor="let p of produtos">
+              <td>{{ p.id }}</td>
+              <td>{{ p.codigo }}</td>
+              <td>{{ p.descricao }}</td>
+              <td>{{ p.saldo }}</td>
+            </tr>
+            <tr *ngIf="produtos.length === 0">
+              <td colspan="4">Nenhum produto encontrado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </section>

@@ -46,6 +46,17 @@
   font-size: 1rem;
 }
 
+.field-hint {
+  margin: 0 0 12px;
+  color: #9ca3af;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.field-hint strong {
+  color: #d1d5db;
+}
+
 .table-panel {
   margin-top: 8px;
 }
@@ -176,9 +187,19 @@
   color: #ffffff;
 }
 
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background-color: #e5e7eb;
   color: #111827;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .small-btn {
