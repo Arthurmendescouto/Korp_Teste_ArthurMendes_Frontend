@@ -1,59 +1,108 @@
-# KorpTesteArthurMendesFrontend
+# Korp — Frontend (Gestão de Estoque e Faturamento)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+SPA em **Angular 21** para o ecossistema **Korp**: cadastro e movimentação de produtos no estoque, emissão de notas fiscais (invoices) e impressão/fechamento da nota. O front consome **duas APIs REST** distintas (estoque e faturamento).
 
-## Development server
+## Requisitos
 
-To start a local development server, run:
+- **Node.js** (LTS recomendado; compatível com Angular 21)
+- **npm** 10+ (o repositório referencia `npm@11.8.0` em `packageManager`)
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Instalação
 
 ```bash
-ng generate component component-name
+git clone <url-do-repositório>
+cd Korp_Teste_ArthurMendes_Frontend
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Configuração das APIs
+
+As URLs base estão em `src/environments/environment.ts` e `src/environments/environment.development.ts` (hoje com os mesmos valores):
+
+| Variável           | Padrão local                          | Uso                          |
+|--------------------|----------------------------------------|------------------------------|
+| `apiEstoque`       | `http://localhost:5259/api`           | Recurso `Produtos`           |
+| `apiFaturamento`   | `http://localhost:5260/api`           | Recurso `Invoices`           |
+
+Ajuste esses endereços se as APIs rodarem em outra porta ou host. Em produção, use `environment.ts` com `production: true` e URLs corretas (e substituição de arquivo conforme `angular.json`, se configurado).
+
+**CORS:** o navegador só chama as APIs se o backend permitir a origem do `ng serve` (por exemplo `http://localhost:4200`).
+
+## Scripts npm
+
+| Comando        | Descrição                                      |
+|----------------|------------------------------------------------|
+| `npm start`    | Servidor de desenvolvimento (`ng serve`)       |
+| `npm run build`| Build de produção (`ng build`)                 |
+| `npm run watch`| Build em modo desenvolvimento com observação   |
+| `npm test`     | Testes unitários (`ng test`, Vitest)           |
+
+## Executar em desenvolvimento
+
+1. Suba as APIs de **Estoque** (5259) e **Faturamento** (5260) conforme o backend do projeto.
+2. No diretório do frontend:
 
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
+3. Abra **http://localhost:4200/** — a rota padrão redireciona para `/estoque`.
 
-To build the project run:
+## Rotas
+
+| Caminho        | Componente        | Função resumida                                      |
+|----------------|-------------------|------------------------------------------------------|
+| `/`            | —                 | Redireciona para `/estoque`                          |
+| `/estoque`     | `EstoqueComponent`| CRUD/movimentação de produtos                        |
+| `/faturamento` | `FaturamentoComponent` | Listagem, busca, emissão e impressão de notas |
+
+A navegação principal está em `src/app/app.html` (abas Estoque / Faturamento).
+
+## Estrutura relevante do código
+
+```
+src/
+├── app/
+│   ├── core/services/
+│   │   ├── estoque.ts       # HttpClient → /Produtos
+│   │   └── faturamento.ts   # HttpClient → /Invoices
+│   ├── pages/
+│   │   ├── estoque/         # UI + estilos do estoque
+│   │   └── faturamento/     # UI + estilos do faturamento + HTML da nota (impressão)
+│   ├── app.routes.ts
+│   ├── app.config.ts        # Router + HttpClient
+│   └── ...
+├── environments/
+└── styles.css               # Tailwind / estilos globais
+```
+
+## Comportamento destacado — Faturamento
+
+- **Gerar nota:** `POST /Invoices` com total e itens (produto por código; o produto deve existir no estoque, regra do negócio/backend).
+- **Imprimir:** `POST /Invoices/{id}/print` retorna um **blob**:
+  - se for **PDF** (`%PDF` ou `Content-Type` de PDF), o arquivo é baixado como `nota-{id}.pdf`;
+  - se for **HTML**, o conteúdo é enriquecido com CSS e aberto em **nova aba** para leitura ou impressão pelo navegador (`Ctrl+P`).
+
+## Build de produção
 
 ```bash
-ng build
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Artefatos em `dist/Korp_Teste_ArthurMendes_Frontend/` (nome do projeto no `angular.json`). Sirva essa pasta com um servidor HTTP estático ou integre ao pipeline de deploy da sua infraestrutura.
 
-## Running unit tests
+## Formatação
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+O projeto inclui **Prettier** (`.prettierrc`). Opcional:
 
 ```bash
-ng test
+npx prettier --write "src/**/*.{ts,html,css}"
 ```
 
-## Running end-to-end tests
+## Licença e autoria
 
-For end-to-end (e2e) testing, run:
+Projeto de teste/portfólio **Korp** — Arthur Mendes (ajuste conforme a licença do repositório principal).
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Gerado com [Angular CLI](https://github.com/angular/angular-cli) 21.2.x. Documentação oficial: [Angular](https://angular.dev).
